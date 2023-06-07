@@ -1,4 +1,7 @@
 package com.example.demo.utils;
+
+
+
 import com.example.demo.services.CustomUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,21 +13,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
     @Bean
-    public UserDetailsService userDetailsService(){
+    public UserDetailsService userDetailsService() {
         return new CustomUserDetailService();
     }
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(){
+    public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
         auth.setUserDetailsService(userDetailsService());
         auth.setPasswordEncoder(passwordEncoder());
@@ -35,36 +37,25 @@ public class SecurityConfig {
             Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/css/**", "/js/**", "/", "/register",
-                                "/error")
+                        .requestMatchers( "/css/**", "/js/**", "/", "/register", "/error")
                         .permitAll()
-
                         .requestMatchers( "/books/edit", "/books/delete")
-
-                        .authenticated()
-
+                        .hasAnyAuthority("ADMIN")
                         .requestMatchers("/books", "/books/add")
-
-                        .authenticated()
-
+                        .hasAnyAuthority("ADMIN","USER")
                         .anyRequest().authenticated()
-
                 )
                 .logout(logout -> logout.logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
-
                         .permitAll()
-
                 )
                 .formLogin(formLogin -> formLogin.loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/")
-
                         .permitAll()
-
                 )
                 .rememberMe(rememberMe -> rememberMe.key("uniqueAndSecret")
                         .tokenValiditySeconds(86400)

@@ -1,7 +1,8 @@
 package com.example.demo.services;
-import com.example.demo.entity.User;
+
 import com.example.demo.entity.CustomUserDetail;
-import com.example.demo.repository.IUserRepository;
+import  com.example.demo.entity.User;
+import  com.example.demo.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,9 +15,10 @@ public class CustomUserDetailService implements UserDetailsService {
     private IUserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
-        User user = userRepository.findByUsername(username);
-        if(user == null)
+        User user = userRepository.findByUserName(username);
+        if(user==null)
             throw new UsernameNotFoundException("User not found");
         return new CustomUserDetail(user, userRepository);
     }
+
 }
